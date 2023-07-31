@@ -18,9 +18,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        UserDatabaseHandler dbHandler = new UserDatabaseHandler(this, null, null, 1);
+
         // Gets the data passed from ListActivity
         String name = getIntent().getStringExtra("name");
         String description = getIntent().getStringExtra("description");
+        int id = getIntent().getIntExtra("id", 0);
         final boolean[] followed = {getIntent().getBooleanExtra("followed", false)}; // In this case, we cannot use a simple boolean because we need to modify the value of the boolean inside the event listener. Anonymous classes and lambda expressions cannot modify local variables, so we need to use a final one-element array instead.
 
         // Initializes a dummy user
@@ -40,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
         followButton.setOnClickListener(v -> {
             followed[0] = !followed[0];
             followButton.setText(followed[0] ? "Unfollow" : "Follow");
+
+            // Updates the user in the database
+            dbHandler.updateUser(new User(name, description, id, followed[0]));
 
             // Creates a Toast indicating the user's actions
             Toast.makeText(getApplicationContext(), followed[0] ? "Followed" : "Unfollowed", Toast.LENGTH_SHORT).show();
